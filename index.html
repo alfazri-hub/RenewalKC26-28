@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Renewal KC - Web Document Generator</title>
+  <meta name="description" content="Aplikasi pembuat dokumen perpanjangan kontrak kerja secara otomatis dan dinamis dengan preview real-time.">
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="index.css">
+</head>
+<body class="dark-theme">
+  <div class="app-container">
+    
+    <!-- HEADER -->
+    <header class="app-header no-print">
+      <div class="header-brand">
+        <div class="logo-icon">
+          <i data-lucide="file-signature"></i>
+        </div>
+        <div class="brand-text">
+          <h1>Renewal KC</h1>
+          <p>Digital Document Automation & Generator</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="date-badge">
+          <i data-lucide="calendar"></i>
+          <span id="current-date-badge">-</span>
+        </div>
+        <button id="theme-toggle" class="btn-icon" title="Ubah Tema">
+          <i data-lucide="sun" class="sun-icon"></i>
+          <i data-lucide="moon" class="moon-icon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="dashboard-content">
+      
+      <!-- FORM PANEL (LEFT) -->
+      <section class="panel form-panel no-print">
+        <div class="panel-header">
+          <i data-lucide="sliders"></i>
+          <h2>Konfigurasi Dokumen</h2>
+        </div>
+        
+        <form id="generator-form" class="scrollable-content">
+          <!-- Dokumen Metadata -->
+          <fieldset class="form-section">
+            <legend>Informasi Dokumen</legend>
+            <div class="form-group">
+              <label for="doc-type">Jenis Dokumen</label>
+              <select id="doc-type" required>
+                <option value="Surat Perpanjangan Kontrak Kerja">Surat Perpanjangan Kontrak Kerja</option>
+                <option value="Surat Perpanjangan Kontrak Magang">Surat Perpanjangan Kontrak Magang</option>
+                <option value="Surat Perpanjangan Kontrak Kemitraan">Surat Perpanjangan Kontrak Kemitraan</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="doc-number">Nomor Surat</label>
+              <input type="text" id="doc-number" value="042/HRD-TELKOM/VII/2026" placeholder="Contoh: 001/HRD/VII/2026" required>
+            </div>
+          </fieldset>
+
+          <!-- Pihak Pertama (Pemberi Kerja) -->
+          <fieldset class="form-section">
+            <legend>Pihak Pertama (Pemberi Kerja)</legend>
+            <div class="form-group">
+              <label for="p1-name">Nama Perwakilan</label>
+              <input type="text" id="p1-name" value="Indra Lesmana, M.T." placeholder="Nama Penanggung Jawab" required>
+            </div>
+            <div class="form-group">
+              <label for="p1-role">Jabatan Perwakilan</label>
+              <input type="text" id="p1-role" value="VP Human Capital Management" placeholder="Contoh: Manager HRD" required>
+            </div>
+            <div class="form-group">
+              <label for="p1-company">Nama Perusahaan</label>
+              <input type="text" id="p1-company" value="PT Telkom Indonesia (Persero) Tbk" placeholder="Nama Perusahaan" required>
+            </div>
+          </fieldset>
+
+          <!-- Pihak Kedua (Karyawan/Mitra) -->
+          <fieldset class="form-section">
+            <legend>Pihak Kedua (Penerima Kerja)</legend>
+            <div class="form-group">
+              <label for="p2-name">Nama Lengkap</label>
+              <input type="text" id="p2-name" value="Muhammad Al Fazri" placeholder="Nama Lengkap Karyawan" required>
+            </div>
+            <div class="form-group">
+              <label for="p2-id">NIK / ID Karyawan</label>
+              <input type="text" id="p2-id" value="101012400286" placeholder="Contoh: 101012400286" required>
+            </div>
+            <div class="form-group">
+              <label for="p2-role">Posisi / Jabatan</label>
+              <input type="text" id="p2-role" value="Software Engineer Intern" placeholder="Contoh: Frontend Developer" required>
+            </div>
+            <div class="form-group">
+              <label for="p2-unit">Unit Kerja / Departemen</label>
+              <input type="text" id="p2-unit" value="Digital Platform & Automation Unit" placeholder="Contoh: Human Capital" required>
+            </div>
+          </fieldset>
+
+          <!-- Detail Kontrak Baru -->
+          <fieldset class="form-section">
+            <legend>Rincian Perpanjangan</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="contract-duration">Durasi Perpanjangan</label>
+                <select id="contract-duration" required>
+                  <option value="6 (Enam) Bulan">6 Bulan</option>
+                  <option value="12 (Dua Belas) Bulan" selected>1 Tahun</option>
+                  <option value="24 (Dua Puluh Empat) Bulan">2 Tahun</option>
+                  <option value="3 (Tiga) Bulan">3 Bulan</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="performance-score">Nilai Evaluasi (%)</label>
+                <input type="number" id="performance-score" min="0" max="100" value="94" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="start-date">Tanggal Mulai Efektif</label>
+                <input type="date" id="start-date" value="2026-08-01" required>
+              </div>
+              <div class="form-group">
+                <label for="end-date">Tanggal Berakhir</label>
+                <input type="date" id="end-date" value="2027-07-31" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="compensation">Kompensasi Bulanan (Rp)</label>
+              <input type="text" id="compensation" value="6.500.000" placeholder="Contoh: 6.500.000" required>
+            </div>
+          </fieldset>
+        </form>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" id="btn-print" class="btn btn-primary">
+            <i data-lucide="printer"></i> Cetak / Simpan PDF
+          </button>
+          <button type="button" id="btn-save" class="btn btn-secondary">
+            <i data-lucide="save"></i> Simpan Riwayat
+          </button>
+          <button type="button" id="btn-reset" class="btn btn-ghost" title="Reset Form">
+            <i data-lucide="rotate-ccw"></i> Reset
+          </button>
+        </div>
+      </section>
+
+      <!-- PREVIEW PANEL (RIGHT) -->
+      <section class="panel preview-panel">
+        <div class="panel-header no-print">
+          <div class="title-with-badge">
+            <i data-lucide="eye"></i>
+            <h2>Pratinjau Dokumen</h2>
+          </div>
+          <div class="preview-badge">Kertas A4</div>
+        </div>
+
+        <div class="preview-scroll-wrapper">
+          <!-- A4 Paper Content for Print and View -->
+          <div id="print-document" class="a4-document">
+            
+            <!-- Kop Surat -->
+            <div class="kop-surat">
+              <div class="kop-logo-placeholder">
+                <i data-lucide="building-2"></i>
+              </div>
+              <div class="kop-text">
+                <h3 id="preview-company-name">PT TELKOM INDONESIA (PERSERO) TBK</h3>
+                <p class="kop-address">Jl. Japati No. 1, Bandung, Jawa Barat 40133</p>
+                <p class="kop-contact">Telp: (022) 4521510 | Email: corporate@telkom.co.id | Web: www.telkom.co.id</p>
+              </div>
+            </div>
+            <hr class="kop-divider">
+
+            <!-- Judul Surat -->
+            <div class="doc-title-container">
+              <h4 id="preview-doc-title" class="doc-title">SURAT PERPANJANGAN KONTRAK KERJA</h4>
+              <p class="doc-number-text">Nomor: <span id="preview-doc-number">042/HRD-TELKOM/VII/2026</span></p>
+            </div>
+
+            <!-- Isi Surat -->
+            <div class="doc-body">
+              <p>Yang bertanda tangan di bawah ini:</p>
+              
+              <!-- Pihak Pertama -->
+              <table class="party-table">
+                <tr>
+                  <td style="width: 140px;">Nama</td>
+                  <td style="width: 10px;">:</td>
+                  <td><strong><span id="preview-p1-name">Indra Lesmana, M.T.</span></strong></td>
+                </tr>
+                <tr>
+                  <td>Jabatan</td>
+                  <td>:</td>
+                  <td><span id="preview-p1-role">VP Human Capital Management</span></td>
+                </tr>
+                <tr>
+                  <td>Perusahaan</td>
+                  <td>:</td>
+                  <td><span id="preview-p1-company">PT Telkom Indonesia (Persero) Tbk</span></td>
+                </tr>
+              </table>
+              
+              <p>Dalam hal ini bertindak untuk dan atas nama <span id="preview-p1-company-ref">PT Telkom Indonesia (Persero) Tbk</span>, selanjutnya disebut sebagai <strong>PIHAK PERTAMA</strong>.</p>
+              
+              <!-- Pihak Kedua -->
+              <table class="party-table">
+                <tr>
+                  <td style="width: 140px;">Nama</td>
+                  <td style="width: 10px;">:</td>
+                  <td><strong><span id="preview-p2-name">Muhammad Al Fazri</span></strong></td>
+                </tr>
+                <tr>
+                  <td>NIK / ID Karyawan</td>
+                  <td>:</td>
+                  <td><span id="preview-p2-id">101012400286</span></td>
+                </tr>
+                <tr>
+                  <td>Posisi</td>
+                  <td>:</td>
+                  <td><span id="preview-p2-role">Software Engineer Intern</span></td>
+                </tr>
+                <tr>
+                  <td>Unit Kerja</td>
+                  <td>:</td>
+                  <td><span id="preview-p2-unit">Digital Platform & Automation Unit</span></td>
+                </tr>
+              </table>
+
+              <p>Selanjutnya disebut sebagai <strong>PIHAK KEDUA</strong>.</p>
+
+              <p class="paragraph-justify">
+                Berdasarkan hasil evaluasi penilaian kinerja PIHAK KEDUA selama masa kerja sebelumnya yang mencapai nilai <strong><span id="preview-performance-score">94</span>%</strong>, PIHAK PERTAMA menyatakan sepakat untuk melakukan perpanjangan hubungan kerja dengan PIHAK KEDUA selama <strong><span id="preview-duration">12 (Dua Belas) Bulan</span></strong>, terhitung sejak tanggal <strong><span id="preview-start-date">1 Agustus 2026</span></strong> sampai dengan tanggal <strong><span id="preview-end-date">31 Juli 2027</span></strong>.
+              </p>
+
+              <p class="paragraph-justify">
+                Selama masa perpanjangan kontrak ini berjalan, PIHAK KEDUA berhak menerima kompensasi/gaji bulanan sebesar <strong>Rp <span id="preview-compensation">6.500.000</span></strong>, serta tunduk sepenuhnya pada peraturan kerja yang berlaku di <span id="preview-company-ref-2">PT Telkom Indonesia (Persero) Tbk</span>.
+              </p>
+
+              <p class="paragraph-justify">
+                Demikian surat perpanjangan kontrak ini dibuat dengan itikad baik dan disetujui oleh kedua belah pihak untuk dipergunakan sebagaimana mestinya.
+              </p>
+            </div>
+
+            <!-- Tanda Tangan -->
+            <div class="signature-section">
+              <div class="signature-column">
+                <p>PIHAK KEDUA,</p>
+                <div class="signature-space"></div>
+                <p class="signature-name" id="preview-p2-name-sig">Muhammad Al Fazri</p>
+                <p class="signature-title">Penerima Kerja</p>
+              </div>
+              <div class="signature-column">
+                <p>Bandung, <span id="preview-date-created">20 Juli 2026</span></p>
+                <p>PIHAK PERTAMA,</p>
+                <div class="signature-space"></div>
+                <p class="signature-name" id="preview-p1-name-sig">Indra Lesmana, M.T.</p>
+                <p class="signature-title" id="preview-p1-role-sig">VP Human Capital Management</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- HISTORY FOOTER SECTION -->
+    <section class="history-section no-print">
+      <div class="history-header">
+        <div class="title-with-badge">
+          <i data-lucide="history"></i>
+          <h2>Riwayat Pembuatan Dokumen</h2>
+          <span id="history-count" class="badge">0</span>
+        </div>
+        <button id="btn-clear-history" class="btn btn-danger-ghost btn-sm" title="Hapus Semua Riwayat">
+          <i data-lucide="trash-2"></i> Hapus Semua
+        </button>
+      </div>
+      
+      <div class="history-grid-wrapper">
+        <div id="history-grid" class="history-grid">
+          <!-- Empty State -->
+          <div class="history-empty">
+            <i data-lucide="folder-open"></i>
+            <p>Belum ada riwayat dokumen yang disimpan.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast">
+    <i data-lucide="info" id="toast-icon"></i>
+    <span id="toast-message">Notifikasi</span>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script src="app.js"></script>
+</body>
+</html>
