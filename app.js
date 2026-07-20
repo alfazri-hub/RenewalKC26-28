@@ -1,5 +1,5 @@
 /**
- * Renewal KC Web Generator - Application Logic
+ * Renewal KC Web Generator - Advanced Application Logic
  * Author: Antigravity AI
  */
 
@@ -43,6 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
     startDate: document.getElementById('start-date'),
     endDate: document.getElementById('end-date'),
     compensation: document.getElementById('compensation'),
+    optStamp: document.getElementById('opt-stamp'),
+    optQr: document.getElementById('opt-qr'),
   };
 
   // Preview elements mappings
@@ -52,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     companyName: document.getElementById('preview-company-name'),
     p1Name: document.getElementById('preview-p1-name'),
     p1NameSig: document.getElementById('preview-p1-name-sig'),
+    p1HandSig: document.getElementById('preview-p1-hand-sig'),
     p1Role: document.getElementById('preview-p1-role'),
     p1RoleSig: document.getElementById('preview-p1-role-sig'),
     p1Company: document.getElementById('preview-p1-company'),
@@ -59,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     p1CompanyRef2: document.getElementById('preview-company-ref-2'),
     p2Name: document.getElementById('preview-p2-name'),
     p2NameSig: document.getElementById('preview-p2-name-sig'),
+    p2HandSig: document.getElementById('preview-p2-hand-sig'),
     p2Id: document.getElementById('preview-p2-id'),
     p2Role: document.getElementById('preview-p2-role'),
     p2Unit: document.getElementById('preview-p2-unit'),
@@ -68,7 +72,18 @@ document.addEventListener('DOMContentLoaded', () => {
     endDate: document.getElementById('preview-end-date'),
     compensation: document.getElementById('preview-compensation'),
     dateCreated: document.getElementById('preview-date-created'),
+    stamp: document.getElementById('preview-stamp'),
+    stampDate: document.getElementById('stamp-current-date'),
+    qr: document.getElementById('preview-qr'),
   };
+
+  // Zoom State
+  let zoomScale = 1.0;
+  const a4Doc = document.getElementById('print-document');
+  const zoomLevelLabel = document.getElementById('zoom-level');
+  const btnZoomIn = document.getElementById('zoom-in');
+  const btnZoomOut = document.getElementById('zoom-out');
+  const btnZoomReset = document.getElementById('zoom-reset');
 
   // Indonesian Months
   const indonesianMonths = [
@@ -87,6 +102,17 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${day} ${month} ${year}`;
   }
 
+  // Helper: Format Date to DD/MM/YYYY for Stamp
+  function formatDateStamp(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
   // Helper: Format Current Date for Badge (DD/MM/YYYY)
   function formatCurrentDate() {
     const today = new Date();
@@ -100,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function showToast(message, type = 'success') {
     toastMessage.textContent = message;
     
-    // Set icon & border color based on type
     if (type === 'success') {
       toast.style.borderColor = 'var(--border-focus)';
       toastIcon.setAttribute('data-lucide', 'check-circle');
@@ -123,6 +148,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 3000);
   }
 
+  // Auto-Calculate End Date based on Start Date + Duration
+  function triggerEndDateCalculation() {
+    const startVal = fields.startDate.value;
+    const durationVal = fields.duration.value;
+    if (!startVal || !durationVal) return;
+
+    const startDate = new Date(startVal);
+    let monthsToAdd = 12;
+
+    if (durationVal.includes('6')) monthsToAdd = 6;
+    else if (durationVal.includes('12')) monthsToAdd = 12;
+    else if (durationVal.includes('24')) monthsToAdd = 24;
+    else if (durationVal.includes('3')) monthsToAdd = 3;
+
+    startDate.setMonth(startDate.getMonth() + monthsToAdd);
+    startDate.setDate(startDate.getDate() - 1); // Subtract 1 day for inclusive end date
+
+    fields.endDate.value = startDate.toISOString().split('T')[0];
+    updatePreview();
+  }
+
+  // Update Progress Bar for Performance Score
+  function updateScoreProgress() {
+    const scoreVal = parseInt(fields.performanceScore.value) || 0;
+    const progressBar = document.getElementById('score-progress-bar');
+    if (progressBar) {
+      progressBar.style.width = `${Math.min(100, Math.max(0, scoreVal))}%`;
+    }
+  }
+
+  // Extract First Name or Short Signature Name
+  function getShortName(fullName) {
+    if (!fullName) return '';
+    const parts = fullName.split(',');
+    const mainName = parts[0].trim();
+    const nameWords = mainName.split(' ');
+    if (nameWords.length > 2) {
+      return nameWords.slice(0, 2).join(' ');
+    }
+    return mainName;
+  }
+
   // Update Preview Panel from Form Fields
   function updatePreview() {
     previews.docTitle.textContent = fields.docType.value.toUpperCase();
@@ -131,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     previews.p1Name.textContent = fields.p1Name.value || '-';
     previews.p1NameSig.textContent = fields.p1Name.value || '-';
+    previews.p1HandSig.textContent = getShortName(fields.p1Name.value);
     
     previews.p1Role.textContent = fields.p1Role.value || '-';
     previews.p1RoleSig.textContent = fields.p1Role.value || '-';
@@ -141,6 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     previews.p2Name.textContent = fields.p2Name.value || '-';
     previews.p2NameSig.textContent = fields.p2Name.value || '-';
+    previews.p2HandSig.textContent = getShortName(fields.p2Name.value);
+    
     previews.p2Id.textContent = fields.p2Id.value || '-';
     previews.p2Role.textContent = fields.p2Role.value || '-';
     previews.p2Unit.textContent = fields.p2Unit.value || '-';
@@ -152,17 +222,109 @@ document.addEventListener('DOMContentLoaded', () => {
     previews.endDate.textContent = formatDateIndonesian(fields.endDate.value);
     previews.compensation.textContent = fields.compensation.value || '0';
     
-    // Document signature date matches current day
+    // Digital Seal date
     const today = new Date();
-    previews.dateCreated.textContent = formatDateIndonesian(today.toISOString().split('T')[0]);
+    const todayStr = today.toISOString().split('T')[0];
+    previews.dateCreated.textContent = formatDateIndonesian(todayStr);
+    previews.stampDate.textContent = formatDateStamp(todayStr);
+
+    // Feature Toggles: Stamp & QR Code
+    if (fields.optStamp.checked) {
+      previews.stamp.style.opacity = '1';
+      previews.stamp.style.pointerEvents = 'auto';
+    } else {
+      previews.stamp.style.opacity = '0';
+      previews.stamp.style.pointerEvents = 'none';
+    }
+
+    if (fields.optQr.checked) {
+      previews.qr.style.display = 'flex';
+    } else {
+      previews.qr.style.display = 'none';
+    }
   }
 
   // Setup form change listener for live preview sync
-  Object.values(fields).forEach(inputElement => {
+  Object.entries(fields).forEach(([key, inputElement]) => {
     if (inputElement) {
-      inputElement.addEventListener('input', updatePreview);
-      inputElement.addEventListener('change', updatePreview);
+      inputElement.addEventListener('input', () => {
+        updatePreview();
+        if (key === 'performanceScore') updateScoreProgress();
+      });
+      inputElement.addEventListener('change', () => {
+        updatePreview();
+        if (key === 'startDate' || key === 'duration') triggerEndDateCalculation();
+      });
     }
+  });
+
+  // COLLAPSIBLE FORM SECTIONS
+  document.querySelectorAll('.section-legend').forEach(legend => {
+    legend.addEventListener('click', (e) => {
+      const parentSection = e.currentTarget.closest('.form-section');
+      parentSection.classList.toggle('collapsed');
+      
+      // Close other sections for custom accordion feel (optional, let's keep it toggleable)
+    });
+  });
+
+  // CONTEXTUAL FOCUS HIGHLIGHTING
+  const sectionHighlights = {
+    'section-doc-meta': 'preview-sec-header',
+    'section-p1': 'preview-sec-parties',
+    'section-p2': 'preview-sec-parties',
+    'section-details': 'preview-sec-details',
+    'section-settings': 'preview-sec-signature'
+  };
+
+  Object.entries(sectionHighlights).forEach(([sectionId, previewBlockId]) => {
+    const formSection = document.getElementById(sectionId);
+    const previewBlock = document.getElementById(previewBlockId);
+    
+    if (formSection && previewBlock) {
+      const inputs = formSection.querySelectorAll('input, select');
+      inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+          previewBlock.classList.add('highlight-active');
+        });
+        input.addEventListener('blur', () => {
+          previewBlock.classList.remove('highlight-active');
+        });
+      });
+    }
+  });
+
+  // ZOOM CONTROLS FOR A4 DOCUMENT PREVIEW
+  function updateZoom() {
+    a4Doc.style.transform = `scale(${zoomScale})`;
+    zoomLevelLabel.textContent = `${Math.round(zoomScale * 100)}%`;
+    
+    // Adjust scroll height wrapper to prevent clipped scales
+    const scrollWrapper = document.getElementById('preview-scroll-wrapper');
+    if (zoomScale > 1) {
+      scrollWrapper.style.padding = `${zoomScale * 2}rem`;
+    } else {
+      scrollWrapper.style.padding = `3rem`;
+    }
+  }
+
+  btnZoomIn.addEventListener('click', () => {
+    if (zoomScale < 1.5) {
+      zoomScale += 0.1;
+      updateZoom();
+    }
+  });
+
+  btnZoomOut.addEventListener('click', () => {
+    if (zoomScale > 0.5) {
+      zoomScale -= 0.1;
+      updateZoom();
+    }
+  });
+
+  btnZoomReset.addEventListener('click', () => {
+    zoomScale = 1.0;
+    updateZoom();
   });
 
   // THEME MANAGEMENT (Light / Dark Mode)
@@ -218,7 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Show newest first
     history.slice().reverse().forEach((item, index) => {
-      // Find actual index in original array
       const originalIndex = history.length - 1 - index;
       
       const card = document.createElement('div');
@@ -283,8 +444,13 @@ document.addEventListener('DOMContentLoaded', () => {
     fields.startDate.value = item.startDate;
     fields.endDate.value = item.endDate;
     fields.compensation.value = item.compensation;
+    
+    // Stamp and QR states loaded
+    fields.optStamp.checked = item.optStamp !== undefined ? item.optStamp : true;
+    fields.optQr.checked = item.optQr !== undefined ? item.optQr : true;
 
     updatePreview();
+    updateScoreProgress();
     showToast('Data dokumen berhasil dimuat!', 'success');
   }
 
@@ -298,7 +464,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Trigger Save Action
   btnSave.addEventListener('click', () => {
-    // Basic validation
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
@@ -324,7 +489,9 @@ document.addEventListener('DOMContentLoaded', () => {
       performanceScore: fields.performanceScore.value,
       startDate: fields.startDate.value,
       endDate: fields.endDate.value,
-      compensation: fields.compensation.value
+      compensation: fields.compensation.value,
+      optStamp: fields.optStamp.checked,
+      optQr: fields.optQr.checked
     };
 
     const history = getHistory();
@@ -348,6 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (confirm('Kosongkan semua isian form?')) {
       form.reset();
       updatePreview();
+      updateScoreProgress();
       showToast('Form berhasil di-reset.', 'info');
     }
   });
@@ -371,16 +539,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Set default values for dates if not pre-set
   const today = new Date();
   const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-  const nextYear = new Date(nextMonth.getFullYear() + 1, nextMonth.getMonth(), 0); // End of contract period
   
   if (!fields.startDate.value) {
     fields.startDate.value = nextMonth.toISOString().split('T')[0];
   }
-  if (!fields.endDate.value) {
-    fields.endDate.value = nextYear.toISOString().split('T')[0];
-  }
-
-  // Load preview & history
+  
+  // Calculate automatic end date and update score bar visual
+  triggerEndDateCalculation();
+  updateScoreProgress();
   updatePreview();
   renderHistory();
 });
