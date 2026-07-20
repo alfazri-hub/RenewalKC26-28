@@ -1,5 +1,5 @@
 /**
- * Renewal KC Web Generator - Advanced Application Logic
+ * Renewal KC Web Generator - Advanced Application Logic (Scroll & Light Theme Optimized)
  * Author: Antigravity AI
  */
 
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Elements Selection
   const form = document.getElementById('generator-form');
-  const themeToggleBtn = document.getElementById('theme-toggle');
+  const themeToggleBtn = document.getElementById('theme-toggle'); // May be null since we removed it
   const currentDateBadge = document.getElementById('current-date-badge');
   
   // Action Buttons
@@ -127,9 +127,9 @@ document.addEventListener('DOMContentLoaded', () => {
     toastMessage.textContent = message;
     
     if (type === 'success') {
-      toast.style.borderColor = 'var(--border-focus)';
+      toast.style.borderColor = '#ef4444'; // Telkom Red Accent border
       toastIcon.setAttribute('data-lucide', 'check-circle');
-      toastIcon.style.color = '#10b981';
+      toastIcon.style.color = '#ef4444';
     } else if (type === 'error') {
       toast.style.borderColor = '#ef4444';
       toastIcon.setAttribute('data-lucide', 'alert-circle');
@@ -238,9 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (fields.optQr.checked) {
-      previews.qr.style.display = 'flex';
+      previews.qr.style.opacity = '1';
     } else {
-      previews.qr.style.display = 'none';
+      previews.qr.style.opacity = '0';
     }
   }
 
@@ -263,8 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
     legend.addEventListener('click', (e) => {
       const parentSection = e.currentTarget.closest('.form-section');
       parentSection.classList.toggle('collapsed');
-      
-      // Close other sections for custom accordion feel (optional, let's keep it toggleable)
     });
   });
 
@@ -298,14 +296,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateZoom() {
     a4Doc.style.transform = `scale(${zoomScale})`;
     zoomLevelLabel.textContent = `${Math.round(zoomScale * 100)}%`;
-    
-    // Adjust scroll height wrapper to prevent clipped scales
-    const scrollWrapper = document.getElementById('preview-scroll-wrapper');
-    if (zoomScale > 1) {
-      scrollWrapper.style.padding = `${zoomScale * 2}rem`;
-    } else {
-      scrollWrapper.style.padding = `3rem`;
-    }
   }
 
   btnZoomIn.addEventListener('click', () => {
@@ -327,29 +317,19 @@ document.addEventListener('DOMContentLoaded', () => {
     updateZoom();
   });
 
-  // THEME MANAGEMENT (Light / Dark Mode)
+  // THEME MANAGEMENT (Optimized to default Light Mode)
   function initTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    if (savedTheme === 'light') {
-      document.body.classList.remove('dark-theme');
-      document.body.classList.add('light-theme');
-    } else {
-      document.body.classList.remove('light-theme');
-      document.body.classList.add('dark-theme');
-    }
+    localStorage.setItem('theme', 'light');
+    document.body.classList.remove('dark-theme');
+    document.body.classList.add('light-theme');
   }
 
-  themeToggleBtn.addEventListener('click', () => {
-    if (document.body.classList.contains('dark-theme')) {
-      document.body.classList.replace('dark-theme', 'light-theme');
-      localStorage.setItem('theme', 'light');
-      showToast('Tema diubah ke Mode Terang', 'info');
-    } else {
-      document.body.classList.replace('light-theme', 'dark-theme');
-      localStorage.setItem('theme', 'dark');
-      showToast('Tema diubah ke Mode Gelap', 'info');
-    }
-  });
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      // Stub theme toggle since it's light theme only now
+      showToast('Aplikasi dioptimalkan untuk Mode Terang saja.', 'info');
+    });
+  }
 
   // HISTORY LOGGER (LocalStorage)
   function getHistory() {
@@ -361,6 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('renewal_history', JSON.stringify(data));
   }
 
+  // Render History List
   function renderHistory() {
     const history = getHistory();
     historyCountBadge.textContent = history.length;
@@ -378,7 +359,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     historyGrid.innerHTML = '';
     
-    // Show newest first
     history.slice().reverse().forEach((item, index) => {
       const originalIndex = history.length - 1 - index;
       
@@ -528,7 +508,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // Save current state first implicitly
     btnSave.click();
-    // Open system print dialog
     window.print();
   });
 
